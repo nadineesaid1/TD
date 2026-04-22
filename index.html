@@ -3,372 +3,1448 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todo List Web App</title>
-    <style>
-        :root {
-    --bg: #0d1117;
-    --card: #161b22;
-    --text: #7e5829;
-    --muted: #352515;
-    --accent: #b36f58d7;
-    --success: #3fb950;
-    --danger: #b16762;
+    <title>My Task - Your companion </title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style> /* ============================================
+   CSS VARIABLES & RESET
+   ============================================ */
+:root {
+    /* Beige Color Palette */
+    --beige-50: #fdfbf7;
+    --beige-100: #f9f5ed;
+    --beige-200: #f3ead9;
+    --beige-300: #eaddc5;
+    --beige-400: #dcc9a8;
+    --beige-500: #c9b08a;
+    --beige-600: #b8986e;
+    --beige-700: #9a7d5a;
+    --beige-800: #7d664b;
+    --beige-900: #66543f;
+
+    /* Pinkish Beige Accents */
+    --pink-beige-100: #faf3f0;
+    --pink-beige-200: #f5e6e0;
+    --pink-beige-300: #eccfc5;
+    --pink-beige-400: #deb0a0;
+    --pink-beige-500: #c9907e;
+    --pink-beige-600: #b87868;
+
+    /* Creamy Beige */
+    --cream-100: #fffdf5;
+    --cream-200: #fff8e1;
+    --cream-300: #ffecb3;
+
+    /* Functional Colors */
+    --text-primary: #5c4a3a;
+    --text-secondary: #8a7a6a;
+    --text-muted: #a89888;
+    --border-light: #e8ddd0;
+    --shadow-soft: rgba(92, 74, 58, 0.08);
+    --shadow-medium: rgba(92, 74, 58, 0.12);
+
+    /* Priority Colors (muted to match palette) */
+    --priority-high: #c9907e;
+    --priority-medium: #c9b08a;
+    --priority-low: #b8c4a0;
+
+    /* Success */
+    --success: #9ab88a;
+    --success-light: #e8f0e3;
 }
 
 * {
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
 }
 
 body {
-    margin: 0;
+    font-family: 'Lato', sans-serif;
+    background-color: var(--beige-100);
+    color: var(--text-primary);
     min-height: 100vh;
-    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    background: radial-gradient(circle at top, #b56b5e 0%, #e5ba91 55%);
-    color: var(--text);
+    line-height: 1.6;
 }
 
-.todo-app {
-    max-width: 700px;
+/* ============================================
+   APP CONTAINER & HEADER
+   ============================================ */
+.app-container {
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 40px 20px 60px;
-}
-
-.todo-header {
+    padding: 24px;
+    min-height: 100vh;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 30px;
+    flex-direction: column;
+    gap: 20px;
 }
 
-.todo-header h1 {
-    margin: 0;
-    font-size: clamp(2rem, 3vw, 3rem);
+.app-header {
+    text-align: center;
+    padding: 30px 20px;
+    background: var(--cream-100);
+    border-radius: 20px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 4px 20px var(--shadow-soft);
 }
 
-.todo-header p {
-    margin: 8px 0 0;
-    color: var(--muted);
+.app-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: var(--beige-800);
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+
+.date-display {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    font-weight: 300;
+}
+
+/* ============================================
+   MAIN FLEX LAYOUT
+   ============================================ */
+.main-flex {
+    display: flex;
+    gap: 24px;
+    flex: 1;
+    min-height: 0;
+}
+
+/* Panels Common Styles */
+.tasks-panel,
+.dashboard-panel {
+    background: var(--cream-100);
+    border-radius: 20px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 4px 24px var(--shadow-soft);
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Left Panel - Tasks */
+.tasks-panel {
+    flex: 1.2;
+    min-width: 0;
+}
+
+/* Right Panel - Dashboard */
+.dashboard-panel {
+    flex: 1;
+    min-width: 320px;
     max-width: 420px;
 }
 
-.back-link {
-    color: var(--accent);
-    text-decoration: none;
-    font-weight: 600;
-    border: 1px solid transparent;
-    padding: 10px 14px;
-    border-radius: 999px;
-    transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-.back-link:hover {
-    background: rgba(227, 144, 75, 0.12);
-    border-color: rgba(222, 158, 102, 0.3);
-}
-
-.todo-panel {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 24px;
-    padding: 28px;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
-}
-
-.todo-form {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 12px;
-    margin-bottom: 24px;
-}
-
-.todo-form input {
-    width: 100%;
-    padding: 16px 18px;
-    font-size: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text);
-}
-
-.todo-form input:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 4px rgba(88, 166, 255, 0.12);
-}
-
-.todo-form button {
-    border: none;
-    background: var(--accent);
-    color: #0b1018;
-    font-weight: 700;
-    padding: 16px 20px;
-    border-radius: 14px;
-    cursor: pointer;
-    transition: transform 0.2s ease, filter 0.2s ease;
-}
-
-.todo-form button:hover {
-    transform: translateY(-1px);
-    filter: brightness(1.08);
-}
-
-.todo-stats {
+.panel-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 18px;
-    color: var(--muted);
-    font-weight: 500;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--beige-200);
 }
 
-.text-button {
-    border: none;
-    background: none;
-    color: var(--accent);
+.panel-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: var(--beige-800);
+}
+
+/* ============================================
+   TASK FILTERS
+   ============================================ */
+.task-filters {
+    display: flex;
+    gap: 8px;
+}
+
+.filter-btn {
+    padding: 6px 16px;
+    border: 1px solid var(--beige-300);
+    background: transparent;
+    color: var(--text-secondary);
+    border-radius: 20px;
     cursor: pointer;
+    font-size: 0.85rem;
+    font-family: 'Lato', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+    background: var(--beige-200);
+    color: var(--text-primary);
+}
+
+.filter-btn.active {
+    background: var(--beige-600);
+    color: white;
+    border-color: var(--beige-600);
+}
+
+/* ============================================
+   ADD TASK
+   ============================================ */
+.add-task-container {
+    display: flex;
+    gap: 10px;
+    padding: 16px;
+    background: var(--beige-50);
+    border-radius: 16px;
+    border: 2px solid var(--beige-200);
+}
+
+#taskInput {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid var(--beige-300);
+    border-radius: 12px;
+    background: white;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-family: 'Lato', sans-serif;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+#taskInput:focus {
+    border-color: var(--pink-beige-400);
+    box-shadow: 0 0 0 3px var(--pink-beige-200);
+}
+
+#taskInput::placeholder {
+    color: var(--text-muted);
+}
+
+#prioritySelect {
+    padding: 12px;
+    border: 1px solid var(--beige-300);
+    border-radius: 12px;
+    background: white;
+    color: var(--text-primary);
+    font-family: 'Lato', sans-serif;
+    cursor: pointer;
+    outline: none;
+}
+
+.btn-primary {
+    padding: 12px 24px;
+    background: var(--beige-700);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
     font-size: 0.95rem;
-    padding: 0;
+    transition: all 0.3s ease;
 }
 
-.text-button:hover {
-    text-decoration: underline;
+.btn-primary:hover {
+    background: var(--beige-800);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow-medium);
 }
 
-.todo-list {
+/* ============================================
+   TASK LIST
+   ============================================ */
+.task-list {
     list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    max-height: 500px;
+    padding-right: 4px;
 }
 
-.todo-item {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
+/* Custom Scrollbar */
+.task-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.task-list::-webkit-scrollbar-track {
+    background: var(--beige-100);
+    border-radius: 10px;
+}
+
+.task-list::-webkit-scrollbar-thumb {
+    background: var(--beige-400);
+    border-radius: 10px;
+}
+
+.task-item {
+    display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     padding: 16px 18px;
-    border-radius: 18px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: white;
+    border-radius: 14px;
+    border: 1px solid var(--border-light);
+    transition: all 0.3s ease;
+    animation: slideIn 0.3s ease;
 }
 
-.todo-item.completed {
-    opacity: 0.7;
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.todo-item.completed .task-label {
+.task-item:hover {
+    box-shadow: 0 4px 16px var(--shadow-soft);
+    transform: translateX(4px);
+}
+
+.task-item.completed {
+    opacity: 0.6;
+    background: var(--beige-50);
+}
+
+.task-item.completed .task-text {
     text-decoration: line-through;
+    color: var(--text-muted);
 }
 
 .task-checkbox {
-    width: 18px;
-    height: 18px;
-    accent-color: var(--accent);
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--beige-400);
+    border-radius: 50%;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    flex-shrink: 0;
 }
 
-.task-label {
-    margin: 0;
-    color: var(--text);
+.task-checkbox:hover {
+    border-color: var(--pink-beige-500);
 }
 
-.task-actions {
+.task-checkbox.checked {
+    background: var(--success);
+    border-color: var(--success);
+}
+
+.task-checkbox.checked::after {
+    content: '✓';
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.task-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.task-text {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    word-break: break-word;
+}
+
+.task-meta {
     display: flex;
     gap: 10px;
+    margin-top: 4px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
 }
 
-.task-button {
+.priority-badge {
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.priority-high {
+    background: var(--pink-beige-200);
+    color: var(--pink-beige-600);
+}
+
+.priority-medium {
+    background: var(--beige-200);
+    color: var(--beige-700);
+}
+
+.priority-low {
+    background: #e8f0e3;
+    color: #7a9a6a;
+}
+
+.task-delete {
+    background: none;
     border: none;
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--muted);
-    width: 38px;
-    height: 38px;
-    border-radius: 12px;
+    color: var(--beige-400);
     cursor: pointer;
-    transition: background 0.8s ease;
+    font-size: 1.2rem;
+    padding: 4px;
+    border-radius: 8px;
+    transition: all 0.3s;
+    opacity: 0;
 }
 
-.task-button:hover {
-    background: rgba(228, 148, 148, 0.15);
+.task-item:hover .task-delete {
+    opacity: 1;
 }
 
-.task-button.delete {
-    color: var(--danger);
+.task-delete:hover {
+    color: var(--pink-beige-600);
+    background: var(--pink-beige-100);
 }
 
+/* Empty State */
 .empty-state {
-    padding: 30px;
     text-align: center;
-    border-radius: 18px;
-    background: rgba(255, 255, 255, 0.03);
-    color: var(--muted);
+    padding: 50px 20px;
+    color: var(--text-muted);
 }
 
-@media (max-width: 560px) {
-    .todo-form {
-        grid-template-columns: 1fr;
+.empty-state p {
+    font-size: 1.1rem;
+    font-style: italic;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ============================================
+   DASHBOARD PANEL
+   ============================================ */
+.stats-card {
+    background: white;
+    border-radius: 16px;
+    padding: 22px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 2px 12px var(--shadow-soft);
+}
+
+.stats-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--beige-800);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Progress Ring */
+.progress-ring-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin: 20px 0;
+}
+
+.progress-ring {
+    transform: rotate(-90deg);
+}
+
+.progress-ring-bg {
+    fill: none;
+    stroke: var(--beige-200);
+    stroke-width: 8;
+}
+
+.progress-ring-fill {
+    fill: none;
+    stroke: var(--pink-beige-400);
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 314;
+    stroke-dashoffset: 314;
+    transition: stroke-dashoffset 0.8s ease;
+}
+
+.progress-text {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-text span {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--beige-800);
+}
+
+.progress-text small {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Stats Row */
+.stats-row {
+    display: flex;
+    justify-content: space-around;
+    padding-top: 16px;
+    border-top: 1px solid var(--beige-100);
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-number {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--beige-800);
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Weekly Chart */
+.weekly-chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 120px;
+    gap: 8px;
+    margin: 16px 0;
+    padding: 0 4px;
+}
+
+.chart-bar-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.chart-bar {
+    width: 100%;
+    background: var(--beige-300);
+    border-radius: 8px 8px 4px 4px;
+    transition: all 0.5s ease;
+    min-height: 4px;
+    position: relative;
+}
+
+.chart-bar:hover {
+    background: var(--pink-beige-400);
+}
+
+.chart-bar.active {
+    background: var(--pink-beige-500);
+}
+
+.chart-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.weekly-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 16px;
+    border-top: 1px solid var(--beige-100);
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.summary-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.summary-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--beige-800);
+}
+
+/* Streak Card */
+.streak-display {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 16px 0;
+}
+
+.streak-number {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--pink-beige-500);
+    font-family: 'Playfair Display', serif;
+}
+
+.streak-label {
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+.streak-message {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-style: italic;
+    line-height: 1.5;
+}
+
+/* ============================================
+   AI ASSISTANT
+   ============================================ */
+.ai-assistant {
+    background: var(--cream-100);
+    border-radius: 20px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 4px 24px var(--shadow-soft);
+    overflow: hidden;
+}
+
+.ai-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    cursor: pointer;
+    background: var(--pink-beige-100);
+    transition: background 0.3s;
+    user-select: none;
+}
+
+.ai-header:hover {
+    background: var(--pink-beige-200);
+}
+
+.ai-avatar {
+    width: 48px;
+    height: 48px;
+    background: var(--pink-beige-300);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.ai-info {
+    flex: 1;
+}
+
+.ai-info h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    color: var(--beige-800);
+}
+
+.ai-status {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.ai-chevron {
+    font-size: 1rem;
+    color: var(--beige-500);
+    transition: transform 0.3s;
+}
+
+.ai-chevron.open {
+    transform: rotate(180deg);
+}
+
+.ai-content {
+    padding: 0 24px 24px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.ai-messages {
+    min-height: 100px;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 16px;
+}
+
+.ai-message {
+    padding: 14px 18px;
+    border-radius: 16px;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    animation: messageSlide 0.3s ease;
+}
+
+@keyframes messageSlide {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ai-message.bot {
+    background: white;
+    border: 1px solid var(--border-light);
+    color: var(--text-primary);
+    border-bottom-left-radius: 4px;
+}
+
+.ai-message.user {
+    background: var(--pink-beige-200);
+    color: var(--text-primary);
+    border-bottom-right-radius: 4px;
+    margin-left: 20%;
+}
+
+.ai-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.ai-btn {
+    padding: 10px 18px;
+    background: white;
+    border: 1px solid var(--beige-300);
+    border-radius: 12px;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-family: 'Lato', sans-serif;
+    font-size: 0.85rem;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ai-btn:hover {
+    background: var(--beige-100);
+    border-color: var(--pink-beige-400);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow-soft);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 900px) {
+    .main-flex {
+        flex-direction: column;
     }
 
-    .todo-header {
+    .dashboard-panel {
+        max-width: 100%;
+    }
+
+    .tasks-panel {
+        flex: none;
+    }
+
+    .app-header h1 {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .app-container {
+        padding: 12px;
+    }
+
+    .add-task-container {
+        flex-wrap: wrap;
+    }
+
+    #taskInput {
+        width: 100%;
+    }
+
+    .panel-header {
         flex-direction: column;
+        gap: 12px;
         align-items: flex-start;
     }
 
-    .todo-item {
-        grid-template-columns: auto 1fr;
+    .task-item:hover .task-delete {
+        opacity: 1;
     }
 
-    .task-actions {
-        justify-content: flex-end;
-        width: 100%;
+    .ai-actions {
+        justify-content: center;
     }
-}
-
+        }
     </style>
 </head>
 <body>
-    <main class="todo-app">
-        <header class="todo-header">
-            <div>
-                <h1>To do List</h1>
-                <p>Plan your day, stay focused, and finish tasks one by one.</p>
-            </div>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1>✨ My Tasks</h1>
+            <p class="date-display" id="currentDate"></p>
         </header>
 
-        <section class="todo-panel">
-            <form id="todo-form" class="todo-form">
-                <input id="todo-input" type="text" placeholder="Add a new task..." aria-label="New task" autocomplete="off">
-                <button type="submit">Add Task</button>
-            </form>
+        <!-- Main Flex Container -->
+        <div class="main-flex">
+            <!-- Left Panel: Task Manager -->
+            <section class="tasks-panel">
+                <div class="panel-header">
+                    <h2>📝 My Tasks</h2>
+                    <div class="task-filters">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="active">Active</button>
+                        <button class="filter-btn" data-filter="completed">Done</button>
+                    </div>
+                </div>
 
-            <div class="todo-stats">
-                <span id="task-count">0 tasks</span>
-                <button id="clear-completed" class="text-button">Clear completed</button>
+                <!-- Add Task Input -->
+                <div class="add-task-container">
+                    <input 
+                        type="text" 
+                        id="taskInput" 
+                        placeholder="What needs to be done today?" 
+                        maxlength="100"
+                    >
+                    <select id="prioritySelect">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                    <button id="addTaskBtn" class="btn-primary">Add</button>
+                </div>
+
+                <!-- Task List -->
+                <ul id="taskList" class="task-list"></ul>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="empty-state hidden">
+                    <p>No tasks yet. Start your day!</p>
+                </div>
+            </section>
+
+            <!-- Right Panel: Dashboard -->
+            <section class="dashboard-panel">
+                <div class="panel-header">
+                    <h2>📊 Dashboard</h2>
+                </div>
+
+                <!-- Daily Stats -->
+                <div class="stats-card daily-stats">
+                    <h3>Today's Progress</h3>
+                    <div class="progress-ring-container">
+                        <svg class="progress-ring" width="120" height="120">
+                            <circle class="progress-ring-bg" cx="60" cy="60" r="50"/>
+                            <circle class="progress-ring-fill" id="dailyProgress" cx="60" cy="60" r="50"/>
+                        </svg>
+                        <div class="progress-text">
+                            <span id="dailyPercent">0%</span>
+                            <small>Done</small>
+                        </div>
+                    </div>
+                    <div class="stats-row">
+                        <div class="stat-item">
+                            <span class="stat-number" id="dailyTotal">0</span>
+                            <span class="stat-label">Total</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="dailyCompleted">0</span>
+                            <span class="stat-label">Completed</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="dailyPending">0</span>
+                            <span class="stat-label">Pending</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weekly Stats -->
+                <div class="stats-card weekly-stats">
+                    <h3>Weekly Overview</h3>
+                    <div class="weekly-chart" id="weeklyChart">
+                        <!-- Bars generated by JS -->
+                    </div>
+                    <div class="weekly-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">Weekly Completed</span>
+                            <span class="summary-value" id="weeklyCompleted">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Weekly Total</span>
+                            <span class="summary-value" id="weeklyTotal">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Best Day</span>
+                            <span class="summary-value" id="bestDay">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Streak Card -->
+                <div class="stats-card streak-card">
+                    <h3>🔥 Streak</h3>
+                    <div class="streak-display">
+                        <span class="streak-number" id="streakCount">0</span>
+                        <span class="streak-label">days in a row</span>
+                    </div>
+                    <p class="streak-message" id="streakMessage">Start completing tasks to build your streak!</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- AI Assistant -->
+        <section class="ai-assistant">
+            <div class="ai-header" id="aiToggle">
+                <div class="ai-avatar">🤖</div>
+                <div class="ai-info">
+                    <h3>Task Assistant</h3>
+                    <span class="ai-status">Click for daily report</span>
+                </div>
+                <span class="ai-chevron" id="aiChevron">▼</span>
             </div>
-
-            <ul id="todo-list" class="todo-list" aria-live="polite"></ul>
+            <div class="ai-content hidden" id="aiContent">
+                <div class="ai-messages" id="aiMessages"></div>
+                <div class="ai-actions">
+                    <button class="ai-btn" id="dailyReportBtn">📋 Daily Report</button>
+                    <button class="ai-btn" id="productivityBtn">📈 Productivity Tips</button>
+                    <button class="ai-btn" id="motivationBtn">💪 Motivation</button>
+                </div>
+            </div>
         </section>
-    </main>
+    </div>
 
-    <script>
-        const todoForm = document.getElementById('todo-form');
-const todoInput = document.getElementById('todo-input');
-const todoList = document.getElementById('todo-list');
-const taskCount = document.getElementById('task-count');
-const clearCompletedButton = document.getElementById('clear-completed');
+    <script>/* ============================================
+   TASK MANAGER APPLICATION
+   ============================================ */
 
-const STORAGE_KEY = 'todoApp.tasks';
-let tasks = [];
-
-function saveTasks() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-}
-
-function loadTasks() {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    tasks = stored ? JSON.parse(stored) : [];
-}
-
-function updateTaskCount() {
-    const remaining = tasks.filter(task => !task.completed).length;
-    const total = tasks.length;
-    taskCount.textContent = total === 0 ? 'No tasks yet' : `${remaining} of ${total} task${total === 1 ? '' : 's'} remaining`;
-}
-
-function createTaskItem(task) {
-    const listItem = document.createElement('li');
-    listItem.className = `todo-item${task.completed ? ' completed' : ''}`;
-    listItem.dataset.id = task.id;
-
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.className = 'task-checkbox';
-    checkbox.checked = task.completed;
-    checkbox.addEventListener('change', () => toggleTask(task.id));
-
-    const label = document.createElement('p');
-    label.className = 'task-label';
-    label.textContent = task.text;
-
-    const actions = document.createElement('div');
-    actions.className = 'task-actions';
-
-    const deleteButton = document.createElement('button');
-    deleteButton.className = 'task-button delete';
-    deleteButton.textContent = '✕';
-    deleteButton.setAttribute('aria-label', 'Delete task');
-    deleteButton.addEventListener('click', () => removeTask(task.id));
-
-    actions.appendChild(deleteButton);
-    listItem.append(checkbox, label, actions);
-
-    return listItem;
-}
-
-function renderTasks() {
-    todoList.innerHTML = '';
-
-    if (tasks.length === 0) {
-        const emptyMessage = document.createElement('div');
-        emptyMessage.className = 'empty-state';
-        emptyMessage.textContent = 'Your todo list is empty. Add a new task to get started!';
-        todoList.appendChild(emptyMessage);
-        updateTaskCount();
-        return;
+class TaskManager {
+    constructor() {
+        this.tasks = this.loadTasks();
+        this.currentFilter = 'all';
+        this.init();
     }
 
-    tasks.forEach(task => todoList.appendChild(createTaskItem(task)));
-    updateTaskCount();
+    init() {
+        this.cacheDOM();
+        this.bindEvents();
+        this.renderDate();
+        this.renderTasks();
+        this.updateDashboard();
+        this.initWeeklyData();
+    }
+
+    cacheDOM() {
+        this.taskInput = document.getElementById('taskInput');
+        this.prioritySelect = document.getElementById('prioritySelect');
+        this.addTaskBtn = document.getElementById('addTaskBtn');
+        this.taskList = document.getElementById('taskList');
+        this.emptyState = document.getElementById('emptyState');
+        this.filterBtns = document.querySelectorAll('.filter-btn');
+        
+        // Dashboard elements
+        this.dailyProgress = document.getElementById('dailyProgress');
+        this.dailyPercent = document.getElementById('dailyPercent');
+        this.dailyTotal = document.getElementById('dailyTotal');
+        this.dailyCompleted = document.getElementById('dailyCompleted');
+        this.dailyPending = document.getElementById('dailyPending');
+        this.weeklyChart = document.getElementById('weeklyChart');
+        this.weeklyCompleted = document.getElementById('weeklyCompleted');
+        this.weeklyTotal = document.getElementById('weeklyTotal');
+        this.bestDay = document.getElementById('bestDay');
+        this.streakCount = document.getElementById('streakCount');
+        this.streakMessage = document.getElementById('streakMessage');
+    }
+
+    bindEvents() {
+        // Add task
+        this.addTaskBtn.addEventListener('click', () => this.addTask());
+        this.taskInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.addTask();
+        });
+
+        // Filters
+        this.filterBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.filterBtns.forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                this.currentFilter = e.target.dataset.filter;
+                this.renderTasks();
+            });
+        });
+
+        // Event delegation for task list clicks
+        this.taskList.addEventListener('click', (e) => {
+            // Handle checkbox click
+            const checkbox = e.target.closest('.task-checkbox');
+            if (checkbox) {
+                e.stopPropagation();
+                const taskItem = checkbox.closest('.task-item');
+                const id = taskItem.dataset.id;
+                this.toggleTask(id);
+                return;
+            }
+
+            // Handle delete button click
+            const deleteBtn = e.target.closest('.task-delete');
+            if (deleteBtn) {
+                e.stopPropagation();
+                const taskItem = deleteBtn.closest('.task-item');
+                const id = taskItem.dataset.id;
+                this.deleteTask(id);
+                return;
+            }
+
+            // Handle task item click (toggle completion)
+            const taskItem = e.target.closest('.task-item');
+            if (taskItem) {
+                const id = taskItem.dataset.id;
+                this.toggleTask(id);
+            }
+        });
+    }
+
+    loadTasks() {
+        const saved = localStorage.getItem('beigeTasks');
+        return saved ? JSON.parse(saved) : [];
+    }
+
+    saveTasks() {
+        localStorage.setItem('beigeTasks', JSON.stringify(this.tasks));
+    }
+
+    generateId() {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+
+    getTodayString() {
+        return new Date().toISOString().split('T')[0];
+    }
+
+    addTask() {
+        const text = this.taskInput.value.trim();
+        if (!text) return;
+
+        const task = {
+            id: this.generateId(),
+            text: text,
+            priority: this.prioritySelect.value,
+            completed: false,
+            createdAt: new Date().toISOString(),
+            date: this.getTodayString()
+        };
+
+        this.tasks.unshift(task);
+        this.saveTasks();
+        this.taskInput.value = '';
+        this.renderTasks();
+        this.updateDashboard();
+    }
+
+    toggleTask(id) {
+        const task = this.tasks.find(t => t.id === id);
+        if (task) {
+            task.completed = !task.completed;
+            task.completedAt = task.completed ? new Date().toISOString() : null;
+            this.saveTasks();
+            this.renderTasks();
+            this.updateDashboard();
+        }
+    }
+
+    deleteTask(id) {
+        this.tasks = this.tasks.filter(t => t.id !== id);
+        this.saveTasks();
+        this.renderTasks();
+        this.updateDashboard();
+    }
+
+    getFilteredTasks() {
+        const today = this.getTodayString();
+        const todayTasks = this.tasks.filter(t => t.date === today);
+
+        switch (this.currentFilter) {
+            case 'active':
+                return todayTasks.filter(t => !t.completed);
+            case 'completed':
+                return todayTasks.filter(t => t.completed);
+            default:
+                return todayTasks;
+        }
+    }
+
+    renderTasks() {
+        const tasks = this.getFilteredTasks();
+        
+        if (tasks.length === 0) {
+            this.taskList.innerHTML = '';
+            this.emptyState.classList.remove('hidden');
+            return;
+        }
+
+        this.emptyState.classList.add('hidden');
+        
+        this.taskList.innerHTML = tasks.map(task => `
+            <li class="task-item ${task.completed ? 'completed' : ''}" data-id="${task.id}">
+                <div class="task-checkbox ${task.completed ? 'checked' : ''}">
+                    ${task.completed ? '<span class="checkmark">✓</span>' : ''}
+                </div>
+                <div class="task-content">
+                    <div class="task-text">${this.escapeHtml(task.text)}</div>
+                    <div class="task-meta">
+                        <span class="priority-badge priority-${task.priority}">${task.priority}</span>
+                        <span>${this.formatTime(task.createdAt)}</span>
+                    </div>
+                </div>
+                <button class="task-delete" title="Delete task">×</button>
+            </li>
+        `).join('');
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    formatTime(isoString) {
+        const date = new Date(isoString);
+        return date.toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+    }
+
+    renderDate() {
+        const options = { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        };
+        document.getElementById('currentDate').textContent = 
+            new Date().toLocaleDateString('en-US', options);
+    }
+
+    /* ============================================
+       DASHBOARD METHODS
+       ============================================ */
+    
+    updateDashboard() {
+        this.updateDailyStats();
+        this.updateWeeklyStats();
+        this.updateStreak();
+    }
+
+    updateDailyStats() {
+        const today = this.getTodayString();
+        const todayTasks = this.tasks.filter(t => t.date === today);
+        const total = todayTasks.length;
+        const completed = todayTasks.filter(t => t.completed).length;
+        const pending = total - completed;
+        const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+        // Update numbers
+        this.dailyTotal.textContent = total;
+        this.dailyCompleted.textContent = completed;
+        this.dailyPending.textContent = pending;
+        this.dailyPercent.textContent = `${percent}%`;
+
+        // Update progress ring
+        const circumference = 2 * Math.PI * 50; // r=50
+        const offset = circumference - (percent / 100) * circumference;
+        this.dailyProgress.style.strokeDashoffset = offset;
+    }
+
+    initWeeklyData() {
+        // Generate last 7 days structure if not exists
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const today = new Date();
+        
+        this.weeklyChart.innerHTML = '';
+        
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(today);
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
+            const dayName = i === 0 ? 'Today' : days[d.getDay()];
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'chart-bar-wrapper';
+            wrapper.innerHTML = `
+                <div class="chart-bar" id="bar-${dateStr}" style="height: 4px;"></div>
+                <span class="chart-label">${dayName}</span>
+            `;
+            this.weeklyChart.appendChild(wrapper);
+        }
+    }
+
+    updateWeeklyStats() {
+        const days = [];
+        const today = new Date();
+        let weeklyCompleted = 0;
+        let weeklyTotal = 0;
+        let bestDayCount = 0;
+        let bestDayName = '-';
+
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(today);
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
+            
+            const dayTasks = this.tasks.filter(t => t.date === dateStr);
+            const dayCompleted = dayTasks.filter(t => t.completed).length;
+            const dayTotal = dayTasks.length;
+            
+            weeklyCompleted += dayCompleted;
+            weeklyTotal += dayTotal;
+
+            // Update bar height
+            const bar = document.getElementById(`bar-${dateStr}`);
+            if (bar) {
+                const height = dayTotal === 0 ? 4 : Math.max(4, (dayCompleted / Math.max(dayTotal, 1)) * 100);
+                bar.style.height = `${height}px`;
+                
+                if (i === 0) bar.classList.add('active');
+                
+                // Tooltip
+                bar.title = `${dayCompleted}/${dayTotal} completed`;
+            }
+
+            // Track best day
+            if (dayCompleted > bestDayCount) {
+                bestDayCount = dayCompleted;
+                bestDayName = d.toLocaleDateString('en-US', { weekday: 'long' });
+            }
+        }
+
+        this.weeklyCompleted.textContent = weeklyCompleted;
+        this.weeklyTotal.textContent = weeklyTotal;
+        this.bestDay.textContent = bestDayCount > 0 ? bestDayName : '-';
+    }
+
+    updateStreak() {
+        let streak = 0;
+        const today = new Date();
+        
+        // Check today first
+        const todayStr = today.toISOString().split('T')[0];
+        const todayTasks = this.tasks.filter(t => t.date === todayStr);
+        const todayCompleted = todayTasks.filter(t => t.completed).length;
+        
+        let checkDate = new Date(today);
+        
+        if (todayTasks.length > 0 && todayCompleted === 0) {
+            checkDate.setDate(checkDate.getDate() - 1);
+        }
+
+        // Count backwards
+        while (true) {
+            const dateStr = checkDate.toISOString().split('T')[0];
+            const dayTasks = this.tasks.filter(t => t.date === dateStr);
+            
+            if (dayTasks.length === 0) {
+                const isToday = dateStr === todayStr;
+                if (!isToday) break;
+            } else {
+                const dayCompleted = dayTasks.filter(t => t.completed).length;
+                if (dayCompleted > 0) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+            
+            checkDate.setDate(checkDate.getDate() - 1);
+            
+            if (streak > 365) break;
+        }
+
+        this.streakCount.textContent = streak;
+
+        // Streak messages
+        const messages = [
+            "Start completing tasks to build your streak! 🔥",
+            "Great start! Keep the momentum going! ✨",
+            "You're on fire! Don't break the chain! 🔥",
+            "Amazing dedication! You're a productivity star! ⭐",
+            "Unstoppable! Your consistency is inspiring! 🏆",
+            "Legendary streak! You're absolutely crushing it! 💪"
+        ];
+        
+        const msgIndex = Math.min(Math.floor(streak / 3), messages.length - 1);
+        this.streakMessage.textContent = streak === 0 ? messages[0] : messages[msgIndex];
+    }
 }
 
-function addTask(text) {
-    const trimmed = text.trim();
-    if (!trimmed) return;
+/* ============================================
+   AI ASSISTANT
+   ============================================ */
 
-    tasks.push({
-        id: Date.now().toString(),
-        text: trimmed,
-        completed: false,
-    });
+class AIAssistant {
+    constructor(taskManager) {
+        this.taskManager = taskManager;
+        this.init();
+    }
 
-    saveTasks();
-    renderTasks();
-    todoInput.value = '';
-    todoInput.focus();
+    init() {
+        this.aiToggle = document.getElementById('aiToggle');
+        this.aiContent = document.getElementById('aiContent');
+        this.aiChevron = document.getElementById('aiChevron');
+        this.aiMessages = document.getElementById('aiMessages');
+        
+        this.dailyReportBtn = document.getElementById('dailyReportBtn');
+        this.productivityBtn = document.getElementById('productivityBtn');
+        this.motivationBtn = document.getElementById('motivationBtn');
+
+        this.bindEvents();
+    }
+
+    bindEvents() {
+        this.aiToggle.addEventListener('click', () => this.togglePanel());
+        
+        this.dailyReportBtn.addEventListener('click', () => this.generateDailyReport());
+        this.productivityBtn.addEventListener('click', () => this.giveProductivityTips());
+        this.motivationBtn.addEventListener('click', () => this.giveMotivation());
+    }
+
+    togglePanel() {
+        const isHidden = this.aiContent.classList.contains('hidden');
+        
+        if (isHidden) {
+            this.aiContent.classList.remove('hidden');
+            this.aiChevron.classList.add('open');
+            this.aiToggle.querySelector('.ai-status').textContent = 'How can I help you?';
+        } else {
+            this.aiContent.classList.add('hidden');
+            this.aiChevron.classList.remove('open');
+            this.aiToggle.querySelector('.ai-status').textContent = 'Click for daily report';
+        }
+    }
+
+    addMessage(text, isBot = true) {
+        const msg = document.createElement('div');
+        msg.className = `ai-message ${isBot ? 'bot' : 'user'}`;
+        msg.textContent = text;
+        this.aiMessages.appendChild(msg);
+        this.aiMessages.scrollTop = this.aiMessages.scrollHeight;
+    }
+
+    generateDailyReport() {
+        const today = new Date().toISOString().split('T')[0];
+        const tasks = this.taskManager.tasks.filter(t => t.date === today);
+        const total = tasks.length;
+        const completed = tasks.filter(t => t.completed).length;
+        const pending = total - completed;
+        const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+        let report = `📋 Daily Report for ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}\n\n`;
+        
+        if (total === 0) {
+            report += "You haven't added any tasks yet today. Start by adding your first task!";
+        } else {
+            report += `• Total tasks: ${total}\n`;
+            report += `• Completed: ${completed} (${percent}%)\n`;
+            report += `• Pending: ${pending}\n\n`;
+
+            if (pending > 0) {
+                report += "📝 Your pending tasks:\n";
+                tasks.filter(t => !t.completed).forEach((t, i) => {
+                    report += `${i + 1}. ${t.text} (${t.priority} priority)\n`;
+                });
+            }
+
+            if (completed > 0) {
+                report += "\n✅ Completed today:\n";
+                tasks.filter(t => t.completed).forEach((t, i) => {
+                    report += `${i + 1}. ${t.text}\n`;
+                });
+            }
+
+            report += "\n";
+            if (percent === 100) {
+                report += "🎉 Outstanding! You've completed everything today!";
+            } else if (percent >= 75) {
+                report += "🔥 Great progress! Almost there!";
+            } else if (percent >= 50) {
+                report += "💪 Good work! Keep pushing forward!";
+            } else if (percent > 0) {
+                report += "📈 You've made a start! Focus on the high priority tasks first.";
+            } else {
+                report += "🌟 New day, new beginnings! Let's get started!";
+            }
+        }
+
+        this.addMessage(report);
+    }
+
+    giveProductivityTips() {
+        const tips = [
+            "🎯 Try the 2-minute rule: If a task takes less than 2 minutes, do it immediately!",
+            "⏰ Use time blocking: Dedicate specific time slots to similar tasks to maintain flow.",
+            "🐸 Eat the frog: Tackle your hardest task first thing in the morning.",
+            "📊 Prioritize wisely: Focus on high-impact tasks rather than just urgent ones.",
+            "🧘 Take breaks: The Pomodoro Technique (25 min work, 5 min break) boosts focus.",
+            "📝 Review your list: Spend 5 minutes each evening planning tomorrow.",
+            "🚫 Avoid multitasking: Focus on one task at a time for better quality and speed.",
+            "🏆 Celebrate wins: Acknowledge completed tasks to stay motivated!"
+        ];
+        
+        const randomTip = tips[Math.floor(Math.random() * tips.length)];
+        this.addMessage(randomTip);
+    }
+
+    giveMotivation() {
+        const quotes = [
+            "✨ \"The secret of getting ahead is getting started.\" — Mark Twain",
+            "🌟 \"You don't have to be great to start, but you have to start to be great.\" — Zig Ziglar",
+            "💪 \"Small progress is still progress. Every step counts!\"",
+            "🔥 \"Your future is created by what you do today, not tomorrow.\" — Robert Kiyosaki",
+            "⭐ \"Believe you can and you're halfway there.\" — Theodore Roosevelt",
+            "🌈 \"Success is the sum of small efforts, repeated day in and day out.\" — Robert Collier",
+            "🚀 \"Don't watch the clock; do what it does. Keep going.\" — Sam Levenson",
+            "💎 \"The only way to do great work is to love what you do.\" — Steve Jobs"
+        ];
+        
+        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+        this.addMessage(randomQuote);
+    }
 }
 
-function toggleTask(id) {
-    tasks = tasks.map(task => task.id === id ? { ...task, completed: !task.completed } : task);
-    saveTasks();
-    renderTasks();
-}
+/* ============================================
+   INITIALIZATION
+   ============================================ */
 
-function removeTask(id) {
-    tasks = tasks.filter(task => task.id !== id);
-    saveTasks();
-    renderTasks();
-}
-
-function clearCompletedTasks() {
-    tasks = tasks.filter(task => !task.completed);
-    saveTasks();
-    renderTasks();
-}
-
-todoForm.addEventListener('submit', event => {
-    event.preventDefault();
-    addTask(todoInput.value);
-});
-
-clearCompletedButton.addEventListener('click', clearCompletedTasks);
-
-loadTasks();
-renderTasks();
-
-    </script>
+const taskManager = new TaskManager();
+const aiAssistant = new AIAssistant(taskManager);</script>
 </body>
 </html>
